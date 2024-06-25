@@ -89,7 +89,7 @@ BEGIN
     
     IF NEW.Umur < MinimumAge THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = CONCAT('Player must be at least ', MinimumAge, ' years old.');
+        SET MESSAGE_TEXT = 'Player must be at least 18 years old.';
     END IF;
 END;
 //
