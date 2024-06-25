@@ -1,6 +1,3 @@
-### README.md
-
-```markdown
 # Esport Database Viewer
 
 Aplikasi Streamlit untuk menampilkan dan menganalisis data dari database esport.
@@ -87,7 +84,7 @@ Jalankan aplikasi Streamlit:
 streamlit run app.py
 ```
 
-Aplikasi akan berjalan dan dapat diakses melalui web browser di alamat `http://localhost:8501`.
+Aplikasi akan berjalan dan dapat diakses melalui web browser di alamat [http://localhost:8501](http://localhost:8501).
 
 ## Struktur Proyek
 
@@ -105,6 +102,16 @@ Berikut adalah struktur direktori proyek:
     ├── player_default.jpg
     └── team_default.jpg
 ```
+
+### Penjelasan Struktur Proyek
+
+- `app.py`: File utama untuk menjalankan aplikasi Streamlit.
+- `setup_database.py`: Script untuk membuat database dan tabel, serta memasukkan data sampel.
+- `input.py`: Modul yang berisi fungsi untuk menangani input data.
+- `esport.sql`: File SQL yang berisi perintah untuk membuat struktur database.
+- `requirements.txt`: Daftar dependensi Python yang diperlukan.
+- `README.md`: File dokumentasi ini.
+- `images/`: Direktori yang berisi gambar default untuk pemain dan tim.
 
 ## Isi Requirements.txt
 
@@ -149,8 +156,7 @@ python delete.py
 Proyek ini dilisensikan di bawah lisensi MIT. Lihat file LICENSE untuk detailnya.
 ```
 
-### Penjelasan
-
+Penjelasan:
 - **Persyaratan**: Menjelaskan perangkat lunak yang harus terinstal.
 - **Langkah-langkah Setup**: Instruksi untuk mengkloning repository, membuat virtual environment, menginstal dependensi, setup MySQL, membuat database dan tabel, serta menjalankan aplikasi.
 - **Struktur Proyek**: Menyediakan gambaran umum tentang struktur direktori proyek.
@@ -159,5 +165,3 @@ Proyek ini dilisensikan di bawah lisensi MIT. Lihat file LICENSE untuk detailnya
 - **Masalah dan Solusi**: Memberikan langkah-langkah pemecahan masalah.
 - **Menghapus Database**: Instruksi untuk menghapus database jika diperlukan.
 - **License**: Informasi lisensi proyek.
-
-Dengan README.md ini, Anda seharusnya dapat mengarahkan pengguna lain untuk mengatur dan menjalankan proyek Anda dengan lebih mudah.
