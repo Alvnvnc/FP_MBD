@@ -49,6 +49,28 @@ Pastikan MySQL Server berjalan di sistem Anda. Anda dapat memulai MySQL Server d
 sudo service mysql start
 ```
 
+#### Buat Pengguna MySQL dan Database
+
+1. Masuk ke MySQL sebagai root:
+
+    ```bash
+    sudo mysql -u root -p
+    ```
+
+2. Buat pengguna baru dan berikan izin:
+
+    ```sql
+    CREATE USER 'your_name'@'localhost' IDENTIFIED BY 'password';
+    GRANT ALL PRIVILEGES ON *.* TO 'your_name'@'localhost' WITH GRANT OPTION;
+    FLUSH PRIVILEGES;
+    ```
+
+3. Buat database `esport_db`:
+
+    ```sql
+    CREATE DATABASE esport_db;
+    ```
+
 ### 5. Buat Database dan Tabel
 
 Jalankan script `setup_database.py` untuk membuat database, tabel, dan memasukkan data sampel:
@@ -75,29 +97,13 @@ Berikut adalah struktur direktori proyek:
 .
 ├── app.py
 ├── setup_database.py
+├── input.py
+├── esport.sql
 ├── requirements.txt
 ├── README.md
 └── images
     ├── player_default.jpg
     └── team_default.jpg
-```
-
-## Konfigurasi MySQL
-
-Pastikan Anda telah membuat pengguna MySQL dan memberikan izin yang diperlukan:
-
-1. Masuk ke MySQL sebagai root:
-
-```bash
-sudo mysql -u root -p
-```
-
-2. Buat pengguna baru dan berikan izin:
-
-```sql
-CREATE USER 'your_name'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON esport_db.* TO 'your_name'@'localhost';
-FLUSH PRIVILEGES;
 ```
 
 ## Isi Requirements.txt
@@ -130,3 +136,28 @@ Jika Anda mengalami masalah saat menjalankan aplikasi, pastikan:
 
 Jika masalah berlanjut, periksa log kesalahan dan sesuaikan konfigurasi sesuai kebutuhan.
 
+## Menghapus Database
+
+Jika Anda ingin menghapus database dan semua tabel di dalamnya, jalankan `delete.py`:
+
+```bash
+python delete.py
+```
+
+## License
+
+Proyek ini dilisensikan di bawah lisensi MIT. Lihat file LICENSE untuk detailnya.
+```
+
+### Penjelasan
+
+- **Persyaratan**: Menjelaskan perangkat lunak yang harus terinstal.
+- **Langkah-langkah Setup**: Instruksi untuk mengkloning repository, membuat virtual environment, menginstal dependensi, setup MySQL, membuat database dan tabel, serta menjalankan aplikasi.
+- **Struktur Proyek**: Menyediakan gambaran umum tentang struktur direktori proyek.
+- **Isi Requirements.txt**: Menyebutkan dependensi yang diperlukan.
+- **Gambar Default**: Menjelaskan kebutuhan gambar default.
+- **Masalah dan Solusi**: Memberikan langkah-langkah pemecahan masalah.
+- **Menghapus Database**: Instruksi untuk menghapus database jika diperlukan.
+- **License**: Informasi lisensi proyek.
+
+Dengan README.md ini, Anda seharusnya dapat mengarahkan pengguna lain untuk mengatur dan menjalankan proyek Anda dengan lebih mudah.
