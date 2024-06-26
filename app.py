@@ -128,7 +128,6 @@ page = st.sidebar.radio("Go to", ["Player", "Team Players", "Salary", "Schedule"
 
 # Navigasi ke halaman yang dipilih
 if page == "Player":
-    st.header('Player Table')
     data = load_data("Player")
     st.subheader("Player Overview")
     
@@ -192,7 +191,6 @@ if page == "Player":
             query = f"INSERT INTO Player (Player_ID, Nama, Umur, Email) VALUES ('{player_id}', '{nama}', {umur}, '{email}')"
             insert_data(query)
 elif page == "Team Players":
-    st.header('Team Players Table')
     player_data = load_data("Player")
     team_data = load_data("Team")
     data = load_data("Player_Team")
@@ -209,28 +207,28 @@ elif page == "Team Players":
             query = f"INSERT INTO Player_Team (Player_Player_ID, Team_Team_ID, Anggota, Pelatih, Detail_Player) VALUES ('{player_id}', '{team_id}', '{anggota}', '{pelatih}', '{detail_player}')"
             insert_data(query)
 elif page == "Salary":
-    st.header('Salary Table')
     salary_data = load_data("Salary")
     player_data = load_data("Player")
     
     st.subheader("Salary Overview")
     salary_data = salary_data.merge(player_data[['Player_ID', 'Nama']], left_on='Player_Player_ID', right_on='Player_ID', how='left')
-    salary_data = salary_data.set_index('Nama')['Jumlah_Pembayar']
-    
-    st.bar_chart(salary_data)
+
+    salary_data.set_index('Nama', inplace=True)
+
+    st.bar_chart(salary_data['Jumlah_Pembayar'])
 
     st.markdown('<div class="salary-container">', unsafe_allow_html=True)
     
     for _, row in salary_data.iterrows():
         st.markdown(f"""
         <div class="salary-card">
-            <h4>{row['Nama']}</h4>
+            <h4>{row.name}</h4>
             <p><b>Jumlah Pembayar:</b> {row['Jumlah_Pembayar']}</p>
             <p><b>Tanggal Pembayar:</b> {row['Tanggal_Pembayar']}</p>
             <p><b>Deskripsi:</b> {row['Deskripsi']}</p>
         </div>
         """, unsafe_allow_html=True)
-        if st.button(f"Delete Salary for {row['Nama']}", key=f"delete_{row['Salary_ID']}"):
+        if st.button(f"Delete Salary for {row.name}", key=f"delete_{row['Salary_ID']}"):
             delete_data("Salary", "Salary_ID", row['Salary_ID'])
             st.experimental_rerun()
     
@@ -248,7 +246,6 @@ elif page == "Salary":
             query = f"INSERT INTO Salary (Salary_ID, Jumlah_Pembayar, Tanggal_Pembayar, Deskripsi, Player_Player_ID) VALUES ('{salary_id}', {jumlah_pembayar}, '{tanggal_pembayar}', '{deskripsi}', '{player_id}')"
             insert_data(query)
 elif page == "Schedule":
-    st.header('Schedule Table')
     data = load_data("Schedule")
     
     st.subheader("Schedule Overview")
@@ -315,9 +312,9 @@ elif page == "Schedule":
             schedule_id = generate_id("SC")
             query = f"INSERT INTO Schedule (Schedule_ID, Jenis_Kegiatan, Tanggal_Kegiatan, Waktu_Mulai, Waktu_Selesai) VALUES ('{schedule_id}', '{jenis_kegiatan}', '{tanggal_kegiatan}', '{waktu_mulai}', '{waktu_selesai}')"
             insert_data(query)
-elif page == "Event":
-    st.header('Event Table')
+if page == "Event":
     data = load_data("Event")
+    team_data = load_data("Team")  # Memuat data tim
     
     st.subheader("Event Overview")
     css = """
@@ -346,11 +343,15 @@ elif page == "Event":
     """
     st.markdown(css, unsafe_allow_html=True)
     
+    # Menggabungkan data event dengan data tim
+    data = data.merge(team_data[['Team_ID', 'Nama_Tim']], left_on='Team_Team_ID', right_on='Team_ID', how='left')
+    
     for _, row in data.iterrows():
         st.markdown(f"""
         <div class="event-card">
             <h4>{row['Jenis_Event']} - {row['Tanggal_Event']}</h4>
             <p>{row['Deskripsi_Event']}</p>
+            <p><b>Team:</b> {row['Nama_Tim']}</p>
         </div>
         """, unsafe_allow_html=True)
         if st.button(f"Delete {row['Jenis_Event']} on {row['Tanggal_Event']}", key=f"delete_{row['Event_ID']}"):
@@ -369,8 +370,8 @@ elif page == "Event":
             event_id = generate_id("E")
             query = f"INSERT INTO Event (Event_ID, Jenis_Event, Tanggal_Event, Deskripsi_Event, Team_Team_ID, Schedule_Schedule_ID) VALUES ('{event_id}', '{jenis_event}', '{tanggal_event}', '{deskripsi_event}', '{team_id}', '{schedule_id}')"
             insert_data(query)
+
 elif page == "Sponsor":
-    st.header('Sponsor Table')
     data = load_data("Sponsor")
     
     st.subheader("Sponsor Overview")

@@ -11,6 +11,7 @@ def create_connection():
             database='esport_db'
         )
         if connection.is_connected():
+            print("Connected to database")
             return connection
     except Error as err:
         print(f"Error: {err}")
@@ -39,11 +40,13 @@ def create_procedures():
             DECLARE vPlayerID CHAR(6);
             DECLARE vEventPointsSum DECIMAL(10,2);
             DECLARE cur_player_events CURSOR FOR
-                SELECT pe.Player_ID, SUM(pe.EventPoints) * 1000 AS EventPointsSum
-                FROM PlayerEvents pe
-                INNER JOIN Event e ON pe.Event_ID = e.Event_ID
-                WHERE e.Tanggal_event BETWEEN DATE_SUB(LAST_DAY(CURDATE()), INTERVAL 1 MONTH) + INTERVAL 1 DAY AND LAST_DAY(CURDATE())
-                GROUP BY pe.Player_ID;
+                SELECT p.Player_ID, SUM(e.Points) * 1000 AS EventPointsSum
+                FROM Player p
+                JOIN Player_Team pt ON p.Player_ID = pt.Player_Player_ID
+                JOIN Team t ON pt.Team_Team_ID = t.Team_ID
+                JOIN Event e ON t.Team_ID = e.Team_Team_ID
+                WHERE e.Tanggal_Event BETWEEN DATE_SUB(LAST_DAY(CURDATE()), INTERVAL 1 MONTH) + INTERVAL 1 DAY AND LAST_DAY(CURDATE())
+                GROUP BY p.Player_ID;
             DECLARE CONTINUE HANDLER FOR NOT FOUND BEGIN END;
             OPEN cur_player_events;
             calc_loop: LOOP
@@ -61,45 +64,6 @@ def create_procedures():
         """
         execute_sql_command(connection, procedure_calculate_player_salaries)
         
-        # Procedure GenerateTeamPerformanceReport
-        procedure_generate_team_performance_report = """
-        CREATE PROCEDURE GenerateTeamPerformanceReport (
-            IN TeamID VARCHAR(6),
-            IN ReportPeriod VARCHAR(20)
-        )
-        BEGIN
-            DECLARE StartDate DATE;
-            DECLARE EndDate DATE;
-            CASE ReportPeriod
-                WHEN 'Monthly' THEN
-                    SET StartDate = DATE_SUB(LAST_DAY(CURDATE()), INTERVAL 1 MONTH) + INTERVAL 1 DAY;
-                    SET EndDate = LAST_DAY(CURDATE());
-                WHEN 'Quarterly' THEN
-                    SET StartDate = DATE_SUB(LAST_DAY(CURDATE()), INTERVAL 3 MONTH) + INTERVAL 1 DAY;
-                    SET EndDate = LAST_DAY(CURDATE());
-                WHEN 'Annual' THEN
-                    SET StartDate = DATE_SUB(LAST_DAY(CURDATE()), INTERVAL 1 YEAR) + INTERVAL 1 DAY;
-                    SET EndDate = LAST_DAY(CURDATE());
-                ELSE
-                    SIGNAL SQLSTATE '45000'
-                    SET MESSAGE_TEXT = 'Invalid ReportPeriod. Supported values are Monthly, Quarterly, or Annual.';
-            END CASE;
-            IF ReportPeriod = 'Monthly' OR ReportPeriod = 'Quarterly' OR ReportPeriod = 'Annual' THEN
-                SELECT t.Nama_Tim, p.Nama, SUM(e.Points) AS TotalPoints
-                FROM Team t
-                JOIN Player_Team pt ON t.Team_ID = pt.Team_Team_ID
-                JOIN Player p ON pt.Player_Player_ID = p.Player_ID
-                JOIN PlayerEvents e ON p.Player_ID = e.Player_ID
-                JOIN Event ev ON e.Event_ID = ev.Event_ID
-                WHERE t.Team_ID = TeamID
-                AND ev.Tanggal_event BETWEEN StartDate AND EndDate
-                GROUP BY t.Nama_Tim, p.Nama
-                ORDER BY TotalPoints DESC;
-            END IF;
-        END;
-        """
-        execute_sql_command(connection, procedure_generate_team_performance_report)
-        
         # Procedure CheckScheduleEventConsistency
         procedure_check_schedule_event_consistency = """
         CREATE PROCEDURE CheckScheduleEventConsistency()
@@ -111,6 +75,29 @@ def create_procedures():
         END;
         """
         execute_sql_command(connection, procedure_check_schedule_event_consistency)
+        
+        # Procedure TotalEventDuration
+        procedure_total_event_duration = """
+        CREATE PROCEDURE TotalEventDuration (
+            IN TeamID VARCHAR(6)
+        )
+        BEGIN
+            SELECT 
+                t.Nama_Tim, 
+                SUM(TIMESTAMPDIFF(HOUR, s.Waktu_Mulai, s.Waktu_Selesai)) AS TotalDurationHours
+            FROM 
+                Team t
+            JOIN 
+                Event e ON t.Team_ID = e.Team_Team_ID
+            JOIN 
+                Schedule s ON e.Schedule_Schedule_ID = s.Schedule_ID
+            WHERE 
+                t.Team_ID = TeamID
+            GROUP BY 
+                t.Nama_Tim;
+        END;
+        """
+        execute_sql_command(connection, procedure_total_event_duration)
 
         connection.close()
 

@@ -6,8 +6,8 @@ def create_connection():
     try:
         connection = mysql.connector.connect(
             host='localhost',
-            user='unko',
-            password='090303',
+            user='alvn',
+            password='Vincent35$',
             database='esport_db'
         )
         if connection.is_connected():
@@ -32,10 +32,11 @@ def execute_sql_command(connection, command):
 def create_function():
     connection = create_connection()
     if connection:
-        # Function to calc number of total event
+        # Function to calculate total events
         function_total_event = """
         CREATE FUNCTION CalculateTotalEvents(team_id CHAR(6))
         RETURNS INT
+        DETERMINISTIC
         BEGIN
             DECLARE total_events INT;
 
@@ -48,10 +49,11 @@ def create_function():
         """
         execute_sql_command(connection, function_total_event)
 
-        # Function to calc avg player salary
+        # Function to calculate average player salary
         function_avg_player_salary = """
         CREATE FUNCTION CalculateAverageSalary(player_id CHAR(6))
         RETURNS NUMERIC(10,2)
+        DETERMINISTIC
         BEGIN
             DECLARE avg_salary NUMERIC(10,2);
 
@@ -64,10 +66,11 @@ def create_function():
         """
         execute_sql_command(connection, function_avg_player_salary)
 
-        # Function to calc total player 
+        # Function to calculate total players
         function_total_player = """
         CREATE FUNCTION CalculateTotalPlayers(team_id CHAR(6))
         RETURNS INT
+        DETERMINISTIC
         BEGIN
             DECLARE total_players INT;
 

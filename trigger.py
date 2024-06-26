@@ -72,7 +72,7 @@ def create_triggers():
         BEFORE INSERT ON Player_Team
         FOR EACH ROW
         BEGIN
-            IF NEW.Detail_Player NOT REGEXP '^[a-zA-Z0-9 ]+/[a-zA-Z0-9 ]+$' THEN
+            IF NEW.Detail_Player NOT REGEXP '^.+/.+$' THEN
                 SIGNAL SQLSTATE '45000'
                 SET MESSAGE_TEXT = 'Detail_Player does not follow the format "nama game/role"';
             END IF;
