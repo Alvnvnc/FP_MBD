@@ -42,22 +42,21 @@ def create_tables():
                     Player_ID CHAR(6) PRIMARY KEY,
                     Nama VARCHAR(50),
                     Umur INTEGER,
-                    Email VARCHAR(30)
+                    Email VARCHAR(30),
+                    Detail_Player VARCHAR(100)
                 )
                 ''',
                 '''
                 CREATE TABLE IF NOT EXISTS Team (
                     Team_ID CHAR(6) PRIMARY KEY,
-                    Nama_Tim VARCHAR(30)
+                    Nama_Tim VARCHAR(30),
+                    Pelatih VARCHAR(50)
                 )
                 ''',
                 '''
                 CREATE TABLE IF NOT EXISTS Player_Team (
                     Player_Player_ID CHAR(6),
                     Team_Team_ID CHAR(6),
-                    Anggota VARCHAR(50),
-                    Pelatih VARCHAR(50),
-                    Detail_Player VARCHAR(100),
                     PRIMARY KEY (Player_Player_ID, Team_Team_ID),
                     FOREIGN KEY (Player_Player_ID) REFERENCES Player(Player_ID),
                     FOREIGN KEY (Team_Team_ID) REFERENCES Team(Team_ID)

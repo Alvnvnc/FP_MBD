@@ -42,8 +42,8 @@ triggers: install
 	$(PYTHON) trigger.py
 
 # Custom input (if any)
-input: install
-	$(PYTHON) input.py
+# input: install
+# 	$(PYTHON) input.py
 
 # Terminal commands (if any)
 terminal: install

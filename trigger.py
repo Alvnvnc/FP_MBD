@@ -94,7 +94,7 @@ def create_triggers():
         """
         execute_sql_command(connection, trigger_validate_detail_player_update)
 
-        execute_sql_command(connection, trigger_validate_detail_player_insert)
+        # execute_sql_command(connection, trigger_validate_detail_player_insert)
 
         # Trigger untuk validasi format Detail_Player pada UPDATE
         trigger_validate_email_format = """
@@ -113,6 +113,24 @@ def create_triggers():
         END
         """
         execute_sql_command(connection, trigger_validate_email_format)
+
+        # Prevent duplicate player name
+        trigger_prevent_duplicate_player_name = """
+        CREATE TRIGGER prevent_duplicate_player_name
+        BEFORE INSERT ON Player
+        FOR EACH ROW
+        BEGIN
+            DECLARE existing_count INT;
+            SELECT COUNT(*) INTO existing_count
+            FROM Player
+            WHERE Nama = NEW.Nama;
+            IF existing_count > 0 THEN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'A player with this name already exists.';
+            END IF;
+        END;
+        """
+        execute_sql_command(connection, trigger_prevent_duplicate_player_name)
         
         connection.close()
 
