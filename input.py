@@ -5,8 +5,8 @@ def create_connection():
     try:
         connection = mysql.connector.connect(
             host='localhost',
-            user='alvn',  # Ganti dengan user MySQL Anda
-            password='Vincent35$',  # Ganti dengan password MySQL Anda
+            user='alvn',
+            password='Vincent35$',
             database='esport_db'
         )
         if connection.is_connected():
@@ -27,16 +27,16 @@ def insert_data(connection):
         cursor.execute("INSERT INTO Player (Player_ID, Nama, Umur, Email) VALUES ('P005', 'Eve', 26, 'eve@example.com')")
 
         # Data tim
-        cursor.execute("INSERT INTO Team (Team_ID, Nama_Tim, Anggota, Pelatih) VALUES ('T001', 'Team A', 'Alice, Bob', 'Coach A')")
-        cursor.execute("INSERT INTO Team (Team_ID, Nama_Tim, Anggota, Pelatih) VALUES ('T002', 'Team B', 'Charlie, Dave', 'Coach B')")
-        cursor.execute("INSERT INTO Team (Team_ID, Nama_Tim, Anggota, Pelatih) VALUES ('T003', 'Team C', 'Eve', 'Coach C')")
+        cursor.execute("INSERT INTO Team (Team_ID, Nama_Tim) VALUES ('T001', 'Team A')")
+        cursor.execute("INSERT INTO Team (Team_ID, Nama_Tim) VALUES ('T002', 'Team B')")
+        cursor.execute("INSERT INTO Team (Team_ID, Nama_Tim) VALUES ('T003', 'Team C')")
 
         # Data hubungan pemain dan tim dengan detail role
-        cursor.execute("INSERT INTO Player_Team (Player_Player_ID, Team_Team_ID, Detail_Player) VALUES ('P001', 'T001', 'Mobile Legends/Marksman')")
-        cursor.execute("INSERT INTO Player_Team (Player_Player_ID, Team_Team_ID, Detail_Player) VALUES ('P002', 'T001', 'Mobile Legends/Tank')")
-        cursor.execute("INSERT INTO Player_Team (Player_Player_ID, Team_Team_ID, Detail_Player) VALUES ('P003', 'T002', 'Dota 2/Carry')")
-        cursor.execute("INSERT INTO Player_Team (Player_Player_ID, Team_Team_ID, Detail_Player) VALUES ('P004', 'T002', 'Dota 2/Support')")
-        cursor.execute("INSERT INTO Player_Team (Player_Player_ID, Team_Team_ID, Detail_Player) VALUES ('P005', 'T003', 'CS:GO/Sniper')")
+        cursor.execute("INSERT INTO Player_Team (Player_Player_ID, Team_Team_ID, Anggota, Pelatih, Detail_Player) VALUES ('P001', 'T001', 'Alice, Bob', 'Coach A', 'Mobile Legends/Marksman')")
+        cursor.execute("INSERT INTO Player_Team (Player_Player_ID, Team_Team_ID, Anggota, Pelatih, Detail_Player) VALUES ('P002', 'T001', 'Alice, Bob', 'Coach A', 'Mobile Legends/Tank')")
+        cursor.execute("INSERT INTO Player_Team (Player_Player_ID, Team_Team_ID, Anggota, Pelatih, Detail_Player) VALUES ('P003', 'T002', 'Charlie, Dave', 'Coach B', 'Dota 2/Carry')")
+        cursor.execute("INSERT INTO Player_Team (Player_Player_ID, Team_Team_ID, Anggota, Pelatih, Detail_Player) VALUES ('P004', 'T002', 'Charlie, Dave', 'Coach B', 'Dota 2/Support')")
+        cursor.execute("INSERT INTO Player_Team (Player_Player_ID, Team_Team_ID, Anggota, Pelatih, Detail_Player) VALUES ('P005', 'T003', 'Eve', 'Coach C', 'CS:GO/Sniper')")
 
         # Data gaji
         cursor.execute("INSERT INTO Salary (Salary_ID, Jumlah_Pembayar, Tanggal_Pembayar, Deskripsi, Player_Player_ID) VALUES ('S001', 5000.00, '2024-01-01', 'Monthly Salary', 'P001')")

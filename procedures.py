@@ -100,6 +100,18 @@ def create_procedures():
         """
         execute_sql_command(connection, procedure_generate_team_performance_report)
         
+        # Procedure CheckScheduleEventConsistency
+        procedure_check_schedule_event_consistency = """
+        CREATE PROCEDURE CheckScheduleEventConsistency()
+        BEGIN
+            DELETE e
+            FROM Event e
+            JOIN Schedule s ON e.Schedule_Schedule_ID = s.Schedule_ID
+            WHERE e.Tanggal_Event <> s.Tanggal_Kegiatan;
+        END;
+        """
+        execute_sql_command(connection, procedure_check_schedule_event_consistency)
+
         connection.close()
 
 if __name__ == "__main__":
