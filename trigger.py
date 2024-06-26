@@ -6,8 +6,8 @@ def create_connection():
     try:
         connection = mysql.connector.connect(
             host='localhost',
-            user='alvn',
-            password='Vincent35$',
+            user='unko',
+            password='090303',
             database='esport_db'
         )
         if connection.is_connected():
@@ -93,6 +93,26 @@ def create_triggers():
         END;
         """
         execute_sql_command(connection, trigger_validate_detail_player_update)
+
+        execute_sql_command(connection, trigger_validate_detail_player_insert)
+
+        # Trigger untuk validasi format Detail_Player pada UPDATE
+        trigger_validate_email_format = """
+        CREATE TRIGGER ValidateEmailFormat
+        BEFORE INSERT ON Player
+        FOR EACH ROW
+        BEGIN
+            DECLARE email_pattern VARCHAR(100);
+            
+            SET email_pattern = '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$';
+            
+            IF NEW.Email REGEXP email_pattern <> 1 THEN
+                SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Invalid email format. Please enter a valid email address.';
+            END IF;
+        END
+        """
+        execute_sql_command(connection, trigger_validate_email_format)
         
         connection.close()
 
