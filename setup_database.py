@@ -5,8 +5,8 @@ def create_database():
     try:
         connection = mysql.connector.connect(
             host='localhost',
-            user='your_name',
-            password='your_password'
+            user='alvn',
+            password='Vincent35$'
         )
         if connection.is_connected():
             cursor = connection.cursor()
@@ -72,7 +72,8 @@ def create_tables_and_insert_data():
                 Tanggal_Kegiatan DATE,
                 Waktu_Mulai TIME,
                 Waktu_Selesai TIME
-            )
+            );
+
             ''')
             cursor.execute('''
             CREATE TABLE IF NOT EXISTS Event (
