@@ -46,7 +46,7 @@ def create_triggers():
         END;
         """
         execute_sql_command(connection, trigger_player_age_validation)
-        
+
         # Trigger TeamRosterLimitTrigger
         trigger_team_roster_limit = """
         CREATE TRIGGER TeamRosterLimitTrigger
@@ -66,24 +66,11 @@ def create_triggers():
         """
         execute_sql_command(connection, trigger_team_roster_limit)
 
-        # Trigger untuk validasi format Detail_Player pada INSERT
-        trigger_validate_detail_player_insert = """
-        CREATE TRIGGER validate_player_team_detail_insert
-        BEFORE INSERT ON Player_Team
-        FOR EACH ROW
-        BEGIN
-            IF NEW.Detail_Player NOT REGEXP '^.+/.+$' THEN
-                SIGNAL SQLSTATE '45000'
-                SET MESSAGE_TEXT = 'Detail_Player does not follow the format "nama game/role"';
-            END IF;
-        END;
-        """
-        execute_sql_command(connection, trigger_validate_detail_player_insert)
 
         # Trigger untuk validasi format Detail_Player pada UPDATE
         trigger_validate_detail_player_update = """
-        CREATE TRIGGER validate_player_team_detail_update
-        BEFORE UPDATE ON Player_Team
+        CREATE TRIGGER validate_player_detail_update
+        BEFORE UPDATE ON Player
         FOR EACH ROW
         BEGIN
             IF NEW.Detail_Player NOT REGEXP '^[a-zA-Z0-9 ]+/[a-zA-Z0-9 ]+$' THEN
@@ -94,9 +81,7 @@ def create_triggers():
         """
         execute_sql_command(connection, trigger_validate_detail_player_update)
 
-        # execute_sql_command(connection, trigger_validate_detail_player_insert)
-
-        # Trigger untuk validasi format Detail_Player pada UPDATE
+        # Trigger untuk validasi format email pada INSERT
         trigger_validate_email_format = """
         CREATE TRIGGER ValidateEmailFormat
         BEFORE INSERT ON Player
@@ -104,7 +89,7 @@ def create_triggers():
         BEGIN
             DECLARE email_pattern VARCHAR(100);
             
-            SET email_pattern = '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$';
+            SET email_pattern = '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$';
             
             IF NEW.Email REGEXP email_pattern <> 1 THEN
                 SIGNAL SQLSTATE '45000'
@@ -131,7 +116,7 @@ def create_triggers():
         END;
         """
         execute_sql_command(connection, trigger_prevent_duplicate_player_name)
-        
+
         connection.close()
 
 if __name__ == "__main__":

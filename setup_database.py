@@ -78,7 +78,9 @@ def create_tables():
                     Jenis_Kegiatan VARCHAR(50),
                     Tanggal_Kegiatan DATE,
                     Waktu_Mulai TIME,
-                    Waktu_Selesai TIME
+                    Waktu_Selesai TIME,
+                    Team_Team_ID CHAR(6),
+                    FOREIGN KEY (Team_Team_ID) REFERENCES Team(Team_ID)
                 )
                 ''',
                 '''
@@ -87,9 +89,7 @@ def create_tables():
                     Jenis_Event VARCHAR(30),
                     Tanggal_Event DATE,
                     Deskripsi_Event VARCHAR(20),
-                    Team_Team_ID CHAR(6),
                     Schedule_Schedule_ID CHAR(6),
-                    FOREIGN KEY (Team_Team_ID) REFERENCES Team(Team_ID),
                     FOREIGN KEY (Schedule_Schedule_ID) REFERENCES Schedule(Schedule_ID)
                 )
                 ''',

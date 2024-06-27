@@ -3,6 +3,7 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 import os
 import uuid
+import datetime
 
 # Fungsi untuk membuat koneksi ke database menggunakan SQLAlchemy
 def create_connection():
@@ -13,14 +14,14 @@ def create_connection():
         st.error(f"Error: {err}")
         return None
 
-# Fungsi untuk memuat player_data dari tabel
+# Fungsi untuk memuat data dari tabel
 def load_data(table_name):
     engine = create_connection()
     if engine:
         with engine.connect() as connection:
             query = text(f"SELECT * FROM {table_name}")
-            player_data = pd.read_sql(query, connection)
-            return player_data
+            data = pd.read_sql(query, connection)
+            return data
     else:
         return pd.DataFrame()
 
@@ -28,7 +29,7 @@ def load_data(table_name):
 def generate_id(prefix):
     return prefix + str(uuid.uuid4().hex[:3]).upper()
 
-# Fungsi untuk menambahkan player_data baru ke tabel
+# Fungsi untuk menambahkan data baru ke tabel
 def insert_data(query):
     engine = create_connection()
     if engine:
@@ -40,7 +41,7 @@ def insert_data(query):
         except Exception as e:
             st.error(f"Error: {e}")
 
-# Fungsi untuk menghapus player_data dari tabel
+# Fungsi untuk menghapus data dari tabel
 def delete_data(table_name, id_column, id_value):
     engine = create_connection()
     if engine:
@@ -52,72 +53,6 @@ def delete_data(table_name, id_column, id_value):
                 st.success(f"Data dengan {id_column} = {id_value} berhasil dihapus!")
         except Exception as e:
             st.error(f"Error: {e}")
-
-# Fungsi untuk menampilkan player_data Player_Team dalam bentuk kartu modern
-# def display_player_team_data(player_data, player_data, team_data):
-    # st.subheader("Team Players Overview")
-    
-    # css = """
-    # <style>
-    #     .team-player-container {
-    #         display: grid;
-    #         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    #         gap: 20px;
-    #     }
-    #     .team-player-card {
-    #         position: relative;
-    #         border-radius: 15px;
-    #         overflow: hidden;
-    #         background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
-    #         color: #333;
-    #         padding: 20px;
-    #         transition: transform 0.3s ease-in-out;
-    #         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    #     }
-    #     .team-player-card:hover {
-    #         transform: translateY(-10px);
-    #         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-    #     }
-    #     .team-player-card h4 {
-    #         margin: 0 0 10px 0;
-    #         color: #333;
-    #     }
-    #     .team-player-card p {
-    #         margin: 0;
-    #         color: #666;
-    #     }
-    #     .team-player-detail {
-    #         margin-top: 10px;
-    #         padding-top: 10px;
-    #         border-top: 1px solid #ddd;
-    #     }
-    # </style>
-    # """
-    # st.markdown(css, unsafe_allow_html=True)
-
-    # st.markdown('<div class="team-player-container">', unsafe_allow_html=True)
-    
-    # for _, row in player_data.iterrows():
-    #     player_name = player_data.loc[player_data['Player_ID'] == row['Player_Player_ID'], 'Nama'].values[0]
-    #     team_name = team_data.loc[team_data['Team_ID'] == row['Team_Team_ID'], 'Nama_Tim'].values[0]
-
-    #     st.markdown(f"""
-    #     <div class="team-player-card">
-    #         <h4>{team_name}</h4>
-    #         <p><b>Anggota:</b> {row['Anggota']}</p>
-    #         <p><b>Pelatih:</b> {row['Pelatih']}</p>
-    #         <div class="team-player-detail">
-    #             <p><b>Player:</b> {player_name}</p>
-    #             <p><b>Detail:</b> {row['Detail_Player']}</p>
-    #         </div>
-    #     </div>
-    #     """, unsafe_allow_html=True)
-    #     if st.button(f"Delete {player_name} from {team_name}", key=f"delete_{row['Player_Player_ID']}_{row['Team_Team_ID']}"):
-    #         delete_data("Player_Team", "Player_Player_ID", row['Player_Player_ID'])
-    #         delete_data("Player_Team", "Team_Team_ID", row['Team_Team_ID'])
-    #         st.experimental_rerun()
-    
-    # st.markdown('</div>', unsafe_allow_html=True)
 
 # Aplikasi Streamlit
 st.title('Esport Database Viewer')
@@ -184,7 +119,6 @@ if page == "Player":
         </div>
         """, unsafe_allow_html=True)
         
-        # Button to delete player and associated team assignments
         if st.button(f"Delete {row['Nama']}", key=f"delete_{row['Player_ID']}"):
             delete_data("Player_Team", "Player_Player_ID", row['Player_ID'])
             delete_data("Player", "Player_ID", row['Player_ID'])
@@ -214,10 +148,7 @@ if page == "Player":
             st.success(f"Player '{nama}' added successfully to team '{team_data.loc[team_data['Team_ID'] == team_id, 'Nama_Tim'].values[0]}'!")
             st.experimental_rerun()
 
-
-
-
-if page == "Team Players":
+elif page == "Team Players":
     team_data = load_data("Team")
     player_team_data = load_data("Player_Team")
     player_data = load_data("Player")
@@ -257,16 +188,6 @@ if page == "Team Players":
             query = f"INSERT INTO Team (Team_ID, Nama_Tim, Pelatih) VALUES ('{team_id}', '{team_name}', '{coach_name}')"
             insert_data(query)
             st.success(f"Team '{team_name}' created successfully!")
-    
-    st.markdown("---")
-    
-    # # Displaying existing teams
-    # st.subheader("Existing Teams")
-    # for _, team_row in team_data.iterrows():
-    #     st.markdown(f"**Team ID:** {team_row['Team_ID']}")
-    #     st.markdown(f"**Team Name:** {team_row['Nama_Tim']}")
-    #     st.markdown(f"**Coach:** {team_row['Pelatih']}")
-    #     st.markdown("---")
 
 elif page == "Salary":
     salary_data = load_data("Salary")
@@ -311,9 +232,9 @@ elif page == "Salary":
             insert_data(query)
             st.experimental_rerun()
 
-
 elif page == "Schedule":
-    player_data = load_data("Schedule")
+    schedule_data = load_data("Schedule")
+    team_data = load_data("Team")
     
     st.subheader("Schedule Overview")
     css = """
@@ -345,7 +266,9 @@ elif page == "Schedule":
         minutes, seconds = divmod(remainder, 60)
         return f"{hours:02}:{minutes:02}:{seconds:02}"
 
-    for _, row in player_data.iterrows():
+    schedule_data = schedule_data.merge(team_data[['Team_ID', 'Nama_Tim']], left_on='Team_Team_ID', right_on='Team_ID', how='left')
+
+    for _, row in schedule_data.iterrows():
         if isinstance(row['Waktu_Mulai'], pd.Timestamp):
             start_time = row['Waktu_Mulai'].strftime("%H:%M:%S")
         else:
@@ -362,6 +285,7 @@ elif page == "Schedule":
             <p><b>Tanggal Kegiatan:</b> {row['Tanggal_Kegiatan'].strftime("%Y-%m-%d")}</p>
             <p><b>Waktu Mulai:</b> {start_time}</p>
             <p><b>Waktu Selesai:</b> {end_time}</p>
+            <p><b>Team:</b> {row['Nama_Tim']}</p>
         </div>
         """, unsafe_allow_html=True)
         if st.button(f"Delete {row['Jenis_Kegiatan']} on {row['Tanggal_Kegiatan']}", key=f"delete_{row['Schedule_ID']}"):
@@ -374,15 +298,18 @@ elif page == "Schedule":
         tanggal_kegiatan = st.date_input("Tanggal Kegiatan")
         waktu_mulai = st.time_input("Waktu Mulai")
         waktu_selesai = st.time_input("Waktu Selesai")
+        team_id = st.selectbox("Team", team_data['Team_ID'].tolist(), format_func=lambda x: team_data.loc[team_data['Team_ID'] == x, 'Nama_Tim'].values[0])
         submitted = st.form_submit_button("Submit")
         if submitted:
             schedule_id = generate_id("SC")
-            query = f"INSERT INTO Schedule (Schedule_ID, Jenis_Kegiatan, Tanggal_Kegiatan, Waktu_Mulai, Waktu_Selesai) VALUES ('{schedule_id}', '{jenis_kegiatan}', '{tanggal_kegiatan}', '{waktu_mulai}', '{waktu_selesai}')"
+            query = f"INSERT INTO Schedule (Schedule_ID, Jenis_Kegiatan, Tanggal_Kegiatan, Waktu_Mulai, Waktu_Selesai, Team_Team_ID) VALUES ('{schedule_id}', '{jenis_kegiatan}', '{tanggal_kegiatan}', '{waktu_mulai}', '{waktu_selesai}', '{team_id}')"
             insert_data(query)
+
 if page == "Event":
-    player_data = load_data("Event")
-    team_data = load_data("Team")  # Memuat player_data tim
-    
+    event_data = load_data("Event")
+    schedule_data = load_data("Schedule")
+    team_data = load_data("Team")
+
     st.subheader("Event Overview")
     css = """
     <style>
@@ -409,15 +336,22 @@ if page == "Event":
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
-    
-    # Menggabungkan player_data event dengan player_data tim
-    player_data = player_data.merge(team_data[['Team_ID', 'Nama_Tim']], left_on='Team_Team_ID', right_on='Team_ID', how='left')
-    
-    for _, row in player_data.iterrows():
+
+    # Menggabungkan data event dengan data schedule dan team
+    event_data = event_data.merge(schedule_data, left_on='Schedule_Schedule_ID', right_on='Schedule_ID', how='left')
+    event_data = event_data.merge(team_data[['Team_ID', 'Nama_Tim']], left_on='Team_Team_ID', right_on='Team_ID', how='left')
+
+    for _, row in event_data.iterrows():
+        start_time = (datetime.datetime.min + row['Waktu_Mulai']).time()
+        end_time = (datetime.datetime.min + row['Waktu_Selesai']).time()
         st.markdown(f"""
         <div class="event-card">
             <h4>{row['Jenis_Event']} - {row['Tanggal_Event']}</h4>
             <p>{row['Deskripsi_Event']}</p>
+            <p><b>Jenis Kegiatan:</b> {row['Jenis_Kegiatan']}</p>
+            <p><b>Tanggal Kegiatan:</b> {row['Tanggal_Kegiatan']}</p>
+            <p><b>Waktu Mulai:</b> {start_time.strftime('%H:%M')}</p>
+            <p><b>Waktu Selesai:</b> {end_time.strftime('%H:%M')}</p>
             <p><b>Team:</b> {row['Nama_Tim']}</p>
         </div>
         """, unsafe_allow_html=True)
@@ -430,16 +364,16 @@ if page == "Event":
         jenis_event = st.text_input("Jenis Event")
         tanggal_event = st.date_input("Tanggal Event")
         deskripsi_event = st.text_input("Deskripsi Event")
-        team_id = st.selectbox("Team ID", load_data("Team")['Team_ID'].tolist())
-        schedule_id = st.selectbox("Schedule ID", load_data("Schedule")['Schedule_ID'].tolist())
+        schedule_nama = st.selectbox("Nama Kegiatan", schedule_data['Jenis_Kegiatan'].tolist())
         submitted = st.form_submit_button("Submit")
         if submitted:
             event_id = generate_id("E")
-            query = f"INSERT INTO Event (Event_ID, Jenis_Event, Tanggal_Event, Deskripsi_Event, Team_Team_ID, Schedule_Schedule_ID) VALUES ('{event_id}', '{jenis_event}', '{tanggal_event}', '{deskripsi_event}', '{team_id}', '{schedule_id}')"
+            schedule_id = schedule_data[schedule_data['Jenis_Kegiatan'] == schedule_nama]['Schedule_ID'].values[0]
+            query = f"INSERT INTO Event (Event_ID, Jenis_Event, Tanggal_Event, Deskripsi_Event, Schedule_Schedule_ID) VALUES ('{event_id}', '{jenis_event}', '{tanggal_event}', '{deskripsi_event}', '{schedule_id}')"
             insert_data(query)
 
 elif page == "Sponsor":
-    player_data = load_data("Sponsor")
+    sponsor_data = load_data("Sponsor")
     
     st.subheader("Sponsor Overview")
     css = """
@@ -482,7 +416,7 @@ elif page == "Sponsor":
 
     st.markdown('<div class="sponsor-container">', unsafe_allow_html=True)
     
-    for _, row in player_data.iterrows():
+    for _, row in sponsor_data.iterrows():
         sponsor_image = f"images/sponsor_{row['Nama_Sponsor']}.jpg"
         if not os.path.exists(sponsor_image):
             sponsor_image = "images/sponsor_default.jpg"  # Gambar default jika tidak ada gambar sponsor
@@ -512,9 +446,22 @@ elif page == "Sponsor":
 
     st.subheader("Add Sponsor-Team Relationship")
     with st.form("sponsor_team_form"):
-        sponsor_id = st.selectbox("Sponsor ID", load_data("Sponsor")['Sponsor_ID'].tolist())
-        team_id = st.selectbox("Team ID", load_data("Team")['Team_ID'].tolist())
+        # Load sponsor and team data
+        sponsor_data = load_data("Sponsor")
+        team_data = load_data("Team")
+
+        # Create dictionaries to map names to IDs
+        sponsor_dict = dict(zip(sponsor_data['Nama_Sponsor'], sponsor_data['Sponsor_ID']))
+        team_dict = dict(zip(team_data['Nama_Tim'], team_data['Team_ID']))
+
+        # Use selectbox with names, but store IDs
+        sponsor_name = st.selectbox("Sponsor", list(sponsor_dict.keys()))
+        team_name = st.selectbox("Team", list(team_dict.keys()))
+
         submitted = st.form_submit_button("Submit")
         if submitted:
+            sponsor_id = sponsor_dict[sponsor_name]
+            team_id = team_dict[team_name]
             query = f"INSERT INTO Sponsor_Team (Sponsor_ID, Team_ID) VALUES ('{sponsor_id}', '{team_id}')"
             insert_data(query)
+            st.success(f"Added relationship: Sponsor '{sponsor_name}' with Team '{team_name}'")
